@@ -1,0 +1,13 @@
+{
+  "name": "prompt-region-trigger",
+  "tree": {
+    "$className": "DataModel",
+    "prompt-region-trigger": {
+      "$path": "Packages",
+      "$ignoreUnknownInstances": true,
+      "prompt-region-trigger": {
+        "$path": "src"
+      }
+    }
+  }
+}
