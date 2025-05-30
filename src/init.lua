@@ -7,31 +7,32 @@
 local CollectionService = game:GetService("CollectionService");
 local Players = game:GetService("Players");
 
-local IDialogueClient = require(script.Parent["dialogue-client-types"]);
-local IDialogueServer = require(script.Parent["dialogue-server-types"]);
+local packages = script.Parent.roblox_packages;
+local IClient = require(packages.client_types);
+local IConversation = require(packages.conversation_types);
 
-type DialogueClient = IDialogueClient.DialogueClient;
-type DialogueServer = IDialogueServer.DialogueServer;
+type Client = IClient.Client;
+type Conversation = IConversation.Conversation;
 
-return function(dialogueClient: DialogueClient)
+return function(client: Client)
 
-  for _, dialogueServerModuleScript in CollectionService:GetTagged("DialogueMaker_DialogueServer") do
+  for _, conversationModuleScript in CollectionService:GetTagged("DialogueMaker_Conversation") do
 
     local didInitialize, errorMessage = pcall(function()
 
       -- We're using pcall because require can throw an error if the module is invalid.
-      local dialogueServer = require(dialogueServerModuleScript) :: DialogueServer;
-      local dialogueServerSettings = dialogueServer:getSettings();
-      local promptRegionPart = dialogueServerSettings.promptRegion.basePart;
+      local conversation = require(conversationModuleScript) :: Conversation;
+      local conversationSettings = conversation:getSettings();
+      local promptRegionPart = conversationSettings.promptRegion.basePart;
       if promptRegionPart then
 
         promptRegionPart.Touched:Connect(function(part)
 
           -- Make sure our player touched it and not someone else
           local PlayerFromCharacter = Players:GetPlayerFromCharacter(part.Parent);
-          if PlayerFromCharacter == Players.LocalPlayer and not dialogueClient.dialogueServer then
+          if PlayerFromCharacter == Players.LocalPlayer and not client:getConversation() then
 
-            dialogueClient:interact(dialogueServer);
+            client:interact(conversation);
 
           end;
 
@@ -43,7 +44,7 @@ return function(dialogueClient: DialogueClient)
 
     if not didInitialize then
 
-      local fullName = dialogueServerModuleScript:GetFullName();
+      local fullName = conversationModuleScript:GetFullName();
       warn(`[Dialogue Maker] Failed to initialize prompt region for {fullName}: {errorMessage}`);
 
     end;
