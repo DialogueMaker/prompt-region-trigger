@@ -8,11 +8,10 @@ local CollectionService = game:GetService("CollectionService");
 local Players = game:GetService("Players");
 
 local packages = script.Parent.roblox_packages;
-local IClient = require(packages.client_types);
-local IConversation = require(packages.conversation_types);
+local DialogueMakerTypes = require(packages.dialogue_maker_types);
 
-type Client = IClient.Client;
-type Conversation = IConversation.Conversation;
+type Client = DialogueMakerTypes.Client;
+type Conversation = DialogueMakerTypes.Conversation;
 
 return function(client: Client)
 
@@ -30,9 +29,10 @@ return function(client: Client)
 
           -- Make sure our player touched it and not someone else
           local PlayerFromCharacter = Players:GetPlayerFromCharacter(part.Parent);
-          if PlayerFromCharacter == Players.LocalPlayer and not client:getConversation() then
+          if PlayerFromCharacter == Players.LocalPlayer and client:getDialogue() == nil then
 
-            client:interact(conversation);
+            local dialogue = conversation:findNextVerifiedDialogue();
+            client:setDialogue(dialogue);
 
           end;
 
